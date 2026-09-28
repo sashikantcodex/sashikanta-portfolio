@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useReducedMotion } from "./use-reduced-motion";
 import {
   conversations,
   experience,
@@ -19,10 +20,10 @@ import { StackGrid } from "./stack-grid";
 import type { Project } from "@/lib/data";
 
 function useCount(target: number, active: boolean, decimals = 0) {
+  const reduce = useReducedMotion();
   const [value, setValue] = useState(0);
   useEffect(() => {
     if (!active) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) {
       setValue(target);
       return;
@@ -38,7 +39,7 @@ function useCount(target: number, active: boolean, decimals = 0) {
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [active, decimals, target]);
+  }, [active, decimals, target, reduce]);
   return value;
 }
 
@@ -77,6 +78,7 @@ function Metric({
 }
 
 export function HomeView() {
+  const reduce = useReducedMotion();
   const featured = projects.filter((project) => project.featured);
   const [selected, setSelected] = useState<Project | null>(null);
   const [typed, setTyped] = useState(1);
@@ -84,7 +86,6 @@ export function HomeView() {
   const loop = useMemo(() => [...stackMarquee, ...stackMarquee], []);
 
   useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) {
       setTyped(terminalLines.length);
       return;
@@ -93,7 +94,7 @@ export function HomeView() {
       setTyped((count) => (count >= terminalLines.length ? count : count + 1));
     }, 220);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [reduce]);
 
   useEffect(() => {
     const node = document.getElementById("impact");
@@ -177,7 +178,7 @@ export function HomeView() {
       <div className="marquee" aria-hidden="true">
         <div className="marquee-track">
           {loop.map((item, index) => (
-            <span key={`${item}-${index}`}>
+            <span key={`${item}-${index}`} className={index >= stackMarquee.length ? "marquee-copy" : undefined}>
               <b>✦</b> {item}
             </span>
           ))}

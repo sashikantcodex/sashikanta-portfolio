@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useReducedMotion } from "./use-reduced-motion";
 
 export function Grain() {
   return (
@@ -31,9 +32,9 @@ export function ScrollProgress() {
 }
 
 export function Cursor() {
+  const reduce = useReducedMotion();
   useEffect(() => {
     const fine = window.matchMedia("(pointer: fine)").matches;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!fine || reduce) return;
     document.body.classList.add("cursor-on");
     const dot = document.createElement("div");
@@ -41,6 +42,7 @@ export function Cursor() {
     dot.className = "cursor-dot";
     ring.className = "cursor-ring";
     document.body.append(dot, ring);
+    let frame = 0;
     let x = 0;
     let y = 0;
     let rx = 0;
@@ -51,41 +53,53 @@ export function Cursor() {
       dot.style.transform = `translate(${x}px, ${y}px)`;
       const hot = (event.target as HTMLElement | null)?.closest("a, button");
       ring.classList.toggle("hot", Boolean(hot));
+      dot.style.opacity = ring.style.opacity = "1";
+      if (!frame) frame = requestAnimationFrame(loop);
     };
     const loop = () => {
       rx += (x - rx) * 0.18;
       ry += (y - ry) * 0.18;
       ring.style.transform = `translate(${rx}px, ${ry}px)`;
-      frame = requestAnimationFrame(loop);
+      frame = Math.abs(x - rx) + Math.abs(y - ry) > 0.2 ? requestAnimationFrame(loop) : 0;
     };
-    let frame = requestAnimationFrame(loop);
+    dot.style.opacity = ring.style.opacity = "0";
+    const hide = () => {
+      dot.style.opacity = ring.style.opacity = "0";
+      cancelAnimationFrame(frame);
+      frame = 0;
+    };
+    window.addEventListener("blur", hide);
+    document.documentElement.addEventListener("mouseleave", hide);
     window.addEventListener("mousemove", move);
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("mousemove", move);
+      window.removeEventListener("blur", hide);
+      document.documentElement.removeEventListener("mouseleave", hide);
       dot.remove();
       ring.remove();
       document.body.classList.remove("cursor-on");
     };
-  }, []);
+  }, [reduce]);
   return null;
 }
 
 export function Boot() {
+  const reduce = useReducedMotion();
   const [phase, setPhase] = useState<"hold" | "play" | "done">("hold");
   useEffect(() => {
-    if (sessionStorage.getItem("ss-boot")) {
-      setPhase("done");
-      return;
-    }
+    if (reduce) { setPhase("done"); return; }
+    try {
+      if (sessionStorage.getItem("ss-boot")) { setPhase("done"); return; }
+    } catch { /* Storage restrictions must not block the page. */ }
     setPhase("play");
     const timer = window.setTimeout(() => {
-      sessionStorage.setItem("ss-boot", "1");
+      try { sessionStorage.setItem("ss-boot", "1"); } catch { /* Continue without persistence. */ }
       setPhase("done");
-    }, 1600);
+    }, 900);
     return () => window.clearTimeout(timer);
-  }, []);
-  if (phase === "done") return null;
+  }, [reduce]);
+  if (phase !== "play" || reduce) return null;
   return (
     <div className="boot" role="status" aria-live="polite">
       <div className="boot-card">
@@ -101,8 +115,8 @@ export function Boot() {
 }
 
 export function ScrollReveal() {
+  const reduce = useReducedMotion();
   useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const nodes = () => [...document.querySelectorAll<HTMLElement>("[data-reveal]")];
     if (reduce) {
       nodes().forEach((node) => node.classList.add("in"));
@@ -122,6 +136,7 @@ export function ScrollReveal() {
       if (!entry.isIntersecting || node.classList.contains("in")) return;
       node.dataset.dir = direction();
       node.classList.add("in");
+      observer.unobserve(node);
     };
 
     const observer = new IntersectionObserver((entries) => entries.forEach(paint), {
@@ -131,7 +146,7 @@ export function ScrollReveal() {
 
     const watch = () => {
       nodes().forEach((node) => {
-        if (node.dataset.watched === "1") return;
+        if (node.classList.contains("in")) return;
         node.dataset.watched = "1";
         observer.observe(node);
       });
@@ -144,7 +159,7 @@ export function ScrollReveal() {
       observer.disconnect();
       mutations.disconnect();
     };
-  }, []);
+  }, [reduce]);
   return null;
 }
 

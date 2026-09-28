@@ -19,15 +19,15 @@ export function ResumeSection() {
           </p>
           <div className="resume-facts">
             <div>
-              <span className="emoji">📍</span>
+              <span className="emoji" aria-hidden="true">📍</span>
               {profile.location}
             </div>
             <div>
-              <span className="emoji">📞</span>
+              <span className="emoji" aria-hidden="true">📞</span>
               <a href={profile.phoneHref}>{profile.phone}</a>
             </div>
             <div>
-              <span className="emoji">✉️</span>
+              <span className="emoji" aria-hidden="true">✉️</span>
               <a href={`mailto:${profile.email}`}>{profile.email}</a>
             </div>
           </div>
