@@ -1145,32 +1145,36 @@ html.js [data-reveal].in {
   .track span { width: var(--w); }
 }
 
-/* Category roots connect to the existing skill inventory. */
-.skill-tree { position: relative; padding: 12px 0 0; }
-.skill-tree-root { position: relative; z-index: 1; width: min(260px, 80%); margin: 0 auto 40px; padding: 20px; display: grid; justify-items: center; gap: 5px; border: 1px solid #9581ff88; border-radius: 20px; background: linear-gradient(135deg, #292648, #102735); box-shadow: 0 0 45px #8175ff20; }
-.skill-tree-root > span { color: #b3a2ff; font-size: 28px; }
-.skill-tree-root strong { font-family: var(--display); font-size: 20px; }
-.skill-tree-root small { font: 10px var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
-.stack-panel .skill-tree-leaves { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 110px; padding: 0 6%; margin: 0; perspective: none; list-style: none; }
-.skill-tree-leaves::before { content: ""; position: absolute; width: 2px; top: -40px; bottom: 38px; left: calc(50% - 1px); background: linear-gradient(#a18aff, #22c9dc); box-shadow: 0 0 14px #8b80ff45; transform-origin: top; animation: skillTrunk 1s ease both; }
-.skill-tree-leaf { position: relative; min-width: 0; animation: stackIn .6s both; }
-.skill-tree-leaf::before { content: ""; position: absolute; height: 2px; width: 55px; top: 50%; right: -55px; background: linear-gradient(90deg, #23cad7, #9184ff); }
-.skill-tree-leaf:nth-child(even)::before { right: auto; left: -55px; }
-.skill-tree-leaf::after { content: ""; position: absolute; width: 6px; height: 6px; top: calc(50% - 2px); right: -58px; border-radius: 50%; background: #b5a5ff; box-shadow: 0 0 14px #a390ff; animation: skillSignal 2.6s ease-in-out infinite; animation-delay: inherit; }
-.skill-tree-leaf:nth-child(even)::after { right: auto; left: -58px; }
-.skill-tree-node { position: relative; width: 100%; min-height: 76px; padding: 16px 22px; display: flex; align-items: center; gap: 15px; text-align: left; border: 1px solid #6873a747; border-radius: 16px; background: linear-gradient(125deg, #192139, #0e1927); color: #e2e8f0; font-size: 14px; cursor: pointer; transition: border-color .2s, box-shadow .2s, transform .2s; }
-.skill-tree-node:hover, .skill-tree-node[aria-pressed="true"] { border-color: #a38bff; box-shadow: 0 0 28px #8c79f929; transform: translateY(-2px); }
-.skill-tree-node:focus-visible, .stack-tab:focus-visible { outline: 2px solid #67e8f9; outline-offset: 4px; }
-.skill-tree-icon { font-size: 25px; flex-shrink: 0; }
-.skill-tree-dot { margin-left: auto; flex-shrink: 0; width: 5px; height: 5px; border-radius: 50%; background: #29cddd; box-shadow: 0 0 12px #29cddd66; }
-.skill-tree-caption { min-height: 44px; margin: 24px 0 0; text-align: center; color: var(--muted); font: 11px/1.7 var(--mono); }
-@keyframes skillTrunk { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-@keyframes skillSignal { 50% { opacity: .35; box-shadow: 0 0 22px #24d5ed; } }
-@media (max-width: 680px) {
-  .skill-tree-root { margin-left: 0; width: 220px; }
-  .stack-panel .skill-tree-leaves { grid-template-columns: 1fr; gap: 14px; padding: 0 0 0 38px; }
-  .skill-tree-leaves::before { left: 16px; }
-  .skill-tree-leaf::before, .skill-tree-leaf:nth-child(even)::before { left: -21px; right: auto; width: 21px; }
-  .skill-tree-leaf::after, .skill-tree-leaf:nth-child(even)::after { left: -24px; right: auto; }
-  .skill-tree-node { padding: 14px; }
+/* Curved, expandable technology tree. SVG connections follow measured cards. */
+.graphic-tree { position: relative; display: grid; grid-template-columns: 21% 1fr; gap: 10%; align-items: center; min-height: 550px; padding: 30px 2%; background: radial-gradient(ellipse at 25% 50%, #8971ff0c, transparent 65%); }
+.graphic-tree-wires { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.graphic-tree-wire { fill: none; stroke-width: 1.5; stroke-dasharray: 1; animation: graphicDraw 1.1s ease both; }
+.graphic-tree-flow { fill: none; stroke: #b5eaff; stroke-width: 2; stroke-dasharray: 3 120; animation: graphicFlow 9s linear infinite; opacity: .65; }
+.graphic-tree-card { position: relative; z-index: 1; display: flex; align-items: center; gap: 12px; min-width: 0; min-height: 76px; padding: 16px; border: 1px solid #7768a54d; border-radius: 15px; background: linear-gradient(125deg, #171d30, #0e1625); text-align: left; }
+.graphic-tree-card strong { display: block; font-size: 13px; font-weight: 500; overflow-wrap: anywhere; }
+.graphic-tree-card small { display: block; margin-top: 6px; color: #8290aa; font: 9px var(--mono); text-transform: uppercase; letter-spacing: .12em; }
+.graphic-tree-symbol { color: #b19aff; flex-shrink: 0; font-size: 19px; }
+.graphic-tree-root { border-color: #9a82ff99; background: linear-gradient(125deg, #292643, #132732); box-shadow: 0 0 45px #8472ff1a; }
+.graphic-tree-branches { display: grid; gap: 32px; }
+.graphic-tree-row { display: grid; grid-template-columns: 37% 45%; gap: 18%; align-items: center; min-height: 110px; }
+.graphic-tree-skills { display: grid; gap: 14px; }
+.graphic-tree-skills[hidden] { display: none; }
+.graphic-tree-skill { width: 100%; animation: graphicAppear .4s ease both; }
+.graphic-tree-branch, .graphic-tree-skill { cursor: pointer; transition: border-color .2s, box-shadow .2s; }
+.graphic-tree-branch:hover, .graphic-tree-skill:hover, .graphic-tree-skill[aria-pressed="true"] { border-color: #a58aff; box-shadow: 0 0 26px #8d77ff22; }
+.graphic-tree-card:focus-visible, .stack-tab:focus-visible { outline: 2px solid #67e8f9; outline-offset: 4px; }
+.graphic-tree-caption { margin: 20px 0; text-align: center; color: var(--muted); font: 11px/1.7 var(--mono); }
+@keyframes graphicDraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes graphicFlow { to { stroke-dashoffset: -492; } }
+@keyframes graphicAppear { from { opacity: 0; } to { opacity: 1; } }
+@media (max-width: 700px) {
+  .graphic-tree { display: flex; flex-direction: column; align-items: stretch; gap: 70px; padding: 20px 0; }
+  .graphic-tree-root { align-self: center; width: 190px; }
+  .graphic-tree-row { grid-template-columns: 42% 47%; gap: 11%; min-height: 130px; }
+  .graphic-tree-branches { gap: 36px; }
+  .graphic-tree-card { padding: 12px 10px; gap: 7px; }
+  .graphic-tree-card strong { font-size: 11px; }
+  .graphic-tree-card small { font-size: 8px; }
+  .graphic-tree-symbol { font-size: 15px; }
 }
+@media (prefers-reduced-motion: reduce) { .graphic-tree-flow { display: none; } }
