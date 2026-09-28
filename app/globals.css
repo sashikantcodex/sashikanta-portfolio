@@ -1144,3 +1144,33 @@ html.js [data-reveal].in {
   .reveal, html.js [data-reveal] { opacity: 1; transform: none; }
   .track span { width: var(--w); }
 }
+
+/* Category roots connect to the existing skill inventory. */
+.skill-tree { position: relative; padding: 12px 0 0; }
+.skill-tree-root { position: relative; z-index: 1; width: min(260px, 80%); margin: 0 auto 40px; padding: 20px; display: grid; justify-items: center; gap: 5px; border: 1px solid #9581ff88; border-radius: 20px; background: linear-gradient(135deg, #292648, #102735); box-shadow: 0 0 45px #8175ff20; }
+.skill-tree-root > span { color: #b3a2ff; font-size: 28px; }
+.skill-tree-root strong { font-family: var(--display); font-size: 20px; }
+.skill-tree-root small { font: 10px var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+.stack-panel .skill-tree-leaves { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 110px; padding: 0 6%; margin: 0; perspective: none; list-style: none; }
+.skill-tree-leaves::before { content: ""; position: absolute; width: 2px; top: -40px; bottom: 38px; left: calc(50% - 1px); background: linear-gradient(#a18aff, #22c9dc); box-shadow: 0 0 14px #8b80ff45; transform-origin: top; animation: skillTrunk 1s ease both; }
+.skill-tree-leaf { position: relative; min-width: 0; animation: stackIn .6s both; }
+.skill-tree-leaf::before { content: ""; position: absolute; height: 2px; width: 55px; top: 50%; right: -55px; background: linear-gradient(90deg, #23cad7, #9184ff); }
+.skill-tree-leaf:nth-child(even)::before { right: auto; left: -55px; }
+.skill-tree-leaf::after { content: ""; position: absolute; width: 6px; height: 6px; top: calc(50% - 2px); right: -58px; border-radius: 50%; background: #b5a5ff; box-shadow: 0 0 14px #a390ff; animation: skillSignal 2.6s ease-in-out infinite; animation-delay: inherit; }
+.skill-tree-leaf:nth-child(even)::after { right: auto; left: -58px; }
+.skill-tree-node { position: relative; width: 100%; min-height: 76px; padding: 16px 22px; display: flex; align-items: center; gap: 15px; text-align: left; border: 1px solid #6873a747; border-radius: 16px; background: linear-gradient(125deg, #192139, #0e1927); color: #e2e8f0; font-size: 14px; cursor: pointer; transition: border-color .2s, box-shadow .2s, transform .2s; }
+.skill-tree-node:hover, .skill-tree-node[aria-pressed="true"] { border-color: #a38bff; box-shadow: 0 0 28px #8c79f929; transform: translateY(-2px); }
+.skill-tree-node:focus-visible, .stack-tab:focus-visible { outline: 2px solid #67e8f9; outline-offset: 4px; }
+.skill-tree-icon { font-size: 25px; flex-shrink: 0; }
+.skill-tree-dot { margin-left: auto; flex-shrink: 0; width: 5px; height: 5px; border-radius: 50%; background: #29cddd; box-shadow: 0 0 12px #29cddd66; }
+.skill-tree-caption { min-height: 44px; margin: 24px 0 0; text-align: center; color: var(--muted); font: 11px/1.7 var(--mono); }
+@keyframes skillTrunk { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes skillSignal { 50% { opacity: .35; box-shadow: 0 0 22px #24d5ed; } }
+@media (max-width: 680px) {
+  .skill-tree-root { margin-left: 0; width: 220px; }
+  .stack-panel .skill-tree-leaves { grid-template-columns: 1fr; gap: 14px; padding: 0 0 0 38px; }
+  .skill-tree-leaves::before { left: 16px; }
+  .skill-tree-leaf::before, .skill-tree-leaf:nth-child(even)::before { left: -21px; right: auto; width: 21px; }
+  .skill-tree-leaf::after, .skill-tree-leaf:nth-child(even)::after { left: -24px; right: auto; }
+  .skill-tree-node { padding: 14px; }
+}

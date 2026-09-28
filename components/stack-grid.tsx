@@ -1,55 +1,11 @@
 "use client";
 
 import { useLayoutEffect, useRef, useState, type MouseEvent } from "react";
-import { skillGroups, type Skill } from "@/lib/data";
-
-function ToolMark({ item }: { item: Skill }) {
-  return (
-    <span className="stack-emoji" aria-hidden="true">
-      {item.emoji}
-    </span>
-  );
-}
-
-function StackCard({ item, index }: { item: Skill; index: number }) {
-  const ref = useRef<HTMLLIElement>(null);
-
-  const tilt = (event: MouseEvent<HTMLLIElement>) => {
-    const node = ref.current;
-    if (!node) return;
-    const box = node.getBoundingClientRect();
-    const x = (event.clientX - box.left) / box.width - 0.5;
-    const y = (event.clientY - box.top) / box.height - 0.5;
-    node.style.setProperty("--rx", `${(-y * 9).toFixed(2)}deg`);
-    node.style.setProperty("--ry", `${(x * 11).toFixed(2)}deg`);
-  };
-
-  const rest = () => {
-    ref.current?.style.setProperty("--rx", "0deg");
-    ref.current?.style.setProperty("--ry", "0deg");
-  };
-
-  return (
-    <li
-      className="stack-card"
-      ref={ref}
-      style={{ animationDelay: `${index * 55}ms`, ["--i" as string]: index }}
-      onMouseMove={tilt}
-      onMouseLeave={rest}
-    >
-      <div className="stack-frame">
-        <div className="stack-face">
-          <span className="stack-sheen" aria-hidden="true" />
-          <ToolMark item={item} />
-          <span className="stack-name">{item.name}</span>
-        </div>
-      </div>
-    </li>
-  );
-}
+import { skillGroups } from "@/lib/data";
 
 export function StackGrid() {
   const [active, setActive] = useState(0);
+  const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
@@ -86,6 +42,7 @@ export function StackGrid() {
   const move = (step: number) => {
     const next = (active + step + skillGroups.length) % skillGroups.length;
     setActive(next);
+    setSelectedSkill(null);
     tabRefs.current[next]?.focus();
   };
 
@@ -129,7 +86,7 @@ export function StackGrid() {
             aria-controls="stack-panel"
             tabIndex={index === active ? 0 : -1}
             className={`stack-tab${index === active ? " on" : ""}`}
-            onClick={() => setActive(index)}
+            onClick={() => { setActive(index); setSelectedSkill(null); }}
           >
             {item.title}
           </button>
@@ -143,11 +100,32 @@ export function StackGrid() {
         key={group.title}
       >
         <p className="stack-layer">{group.heading}</p>
-        <ul>
-          {group.items.map((item, index) => (
-            <StackCard key={item.name} item={item} index={index} />
-          ))}
-        </ul>
+        <div className="skill-tree">
+          <div className="skill-tree-root">
+            <span aria-hidden="true">◈</span>
+            <strong>{group.title}</strong>
+            <small>{group.items.length} connected skills</small>
+          </div>
+          <ul className="skill-tree-leaves" aria-label={`${group.title} skills`}>
+            {group.items.map((item, index) => (
+              <li className="skill-tree-leaf" key={item.name} style={{ animationDelay: `${index * 45}ms` }}>
+                <button
+                  type="button"
+                  className="skill-tree-node"
+                  aria-pressed={selectedSkill === item.name}
+                  onClick={() => setSelectedSkill(selectedSkill === item.name ? null : item.name)}
+                >
+                  <span className="skill-tree-icon" aria-hidden="true">{item.emoji}</span>
+                  <span>{item.name}</span>
+                  <span className="skill-tree-dot" aria-hidden="true" />
+                </button>
+              </li>
+            ))}
+          </ul>
+          <p className="skill-tree-caption" aria-live="polite">
+            {selectedSkill ? `${selectedSkill} · ${group.heading}` : "Explore a category, then select a skill along its branches."}
+          </p>
+        </div>
       </div>
     </div>
   );
