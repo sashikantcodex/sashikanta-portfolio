@@ -5,9 +5,15 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "node --test tests/*.test.cjs",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ai-sdk/google": "^4.0.86",
+    "@ai-sdk/groq": "^4.0.53",
+    "@ai-sdk/react": "^4.0.126",
+    "ai": "^7.0.123",
     "next": "^15.5.4",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"

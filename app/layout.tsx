@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+import { ChatWidget } from "@/components/chat-widget";
 import { Boot, Cursor, Footer, Grain, Nav, ScrollProgress, ScrollReveal } from "@/components/chrome";
 
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Nav />
         <main>{children}</main>
         <Footer />
+        <ChatWidget />
       </body>
     </html>
   );
